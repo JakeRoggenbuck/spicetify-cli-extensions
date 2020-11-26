@@ -5,7 +5,22 @@
 // DESCRIPTION: Auto Skip Sad Songs
 
 (function SkipSad() {
+    if (!Spicetify.LocalStorage) {
+        setTimeout(SkipSad, 1000);
+        return;
+    }
+
+    let isEnabled = Spicetify.LocalStorage.get("SkipSad") === "1";
+
+    // Add menu item to enable feature
+    new Spicetify.Menu.Item("Skip Sad Songs", isEnabled, (self) => {
+        isEnabled = !isEnabled;
+        Spicetify.LocalStorage.set("SkipSad", isEnabled ? "1" : "0");
+        self.setState(isEnabled);
+    }).register();
+
     Spicetify.Player.addEventListener("songchange", () => {
+        if (!isEnabled) return;
         const data = Spicetify.Player.data || Spicetify.Queue;
         if (!data) return;
 
